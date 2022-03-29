@@ -2,4 +2,4 @@
 
 The Odin Project: Rock Paper Scissors Game.
 
-This project allows the user to play against the Computer through the Console.
+A Rock-Paper-Scissors Game against Computer. First one to Score 5 Points Win.

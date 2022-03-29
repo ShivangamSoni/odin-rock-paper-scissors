@@ -1,55 +1,71 @@
-const moves = {
-  1: "Rock",
-  2: "Scissors",
-  3: "Paper",
-};
+// Game Play Related Functions
+import { scores, computerPlay, playerPlay, playRound, announceWinner } from "./modules/game.js";
 
-const scores = {
-  computer: 0,
-  player: 0,
-};
+// Background Colors
+const bgColors = ["#FF6B6B", "#6BCB77", "#4D96FF", "#845EC2", "#42C2FF"];
 
-const computerPlay = () => {
-  let selection = parseInt(Math.random() * 3) + 1;
-  return selection;
-};
+// Elements
+const moveButtons = document.querySelectorAll(".move");
+const result = document.querySelectorAll(".result");
+const playerScore = document.querySelector(".playerScore");
+const computerScore = document.querySelector(".computerScore");
+const playButton = document.querySelector("#playReset");
+const splash = document.querySelector(".splash");
 
-const playerPlay = () => {
-  let selection = parseInt(prompt("Options:\n\t1. Rock\n\t2. Scissors\n\t3. Paper\n\nEnter Your Move:"));
-  return selection;
-};
-
-const playRound = (player, computer) => {
-  if ((player === 1 && computer === 2) || (player === 2 && computer === 3) || (player === 3 && computer === 1)) {
-    console.log(`You Win this Round! ${moves[player]} beats ${moves[computer]}`);
-    scores.player++;
-  } else if ((computer === 1 && player === 2) || (computer === 2 && player === 3) || (computer === 3 && player === 1)) {
-    console.log(`You Lose this Round! ${moves[computer]} beats ${moves[player]}`);
-    scores.computer++;
-  } else {
-    console.log(`Its a Tie! Both Selected ${moves[player]}`);
-  }
-};
-
-const announceWinner = () => {
-  const { player, computer } = scores;
-
-  const scoreBoard = `Player: ${player} | Computer: ${computer}`;
-
-  if (player > computer) {
-    console.log(`${scoreBoard}\nYou Win the Game`);
-  } else if (computer > player) {
-    console.log(`${scoreBoard}\nYou Loose the Game`);
-  } else {
-    console.log(`${scoreBoard}\nIts a Tie`);
-  }
-};
-
-for (let i = 1; i <= 5; i++) {
-  const playerSelection = playerPlay();
+const handlePlyerMove = (e) => {
   const computerSelection = computerPlay();
-  console.log(`Round #${i}`);
-  playRound(playerSelection, computerSelection);
-}
+  const playerSelection = playerPlay(e.target);
 
-announceWinner();
+  const roundResult = playRound(playerSelection, computerSelection);
+  result[0].textContent = roundResult;
+  result[0].classList.add("show");
+
+  displayScores();
+};
+
+const displayScores = () => {
+  const { player, computer } = scores;
+  playerScore.textContent = `Player: ${player}`;
+  computerScore.textContent = `Computer: ${computer}`;
+
+  if (player === 5 || computer === 5) {
+    const resultString = announceWinner();
+    result[1].textContent = resultString;
+
+    playButton.textContent = "Play Again";
+    splash.classList.add("show");
+
+    moveButtons.forEach((button) => {
+      button.removeEventListener("click", handlePlyerMove);
+    });
+
+    playButton.addEventListener("click", start);
+  }
+};
+
+const setBackground = () => {
+  const index = parseInt(Math.random() * bgColors.length);
+  document.body.style.backgroundColor = bgColors[index];
+};
+
+const start = () => {
+  moveButtons.forEach((button) => {
+    button.addEventListener("click", handlePlyerMove);
+  });
+
+  playButton.removeEventListener("click", start);
+
+  scores.player = 0;
+  scores.computer = 0;
+
+  result.forEach((r) => (r.textContent = ""));
+  result[0].classList.remove("show");
+
+  setBackground();
+
+  splash.classList.remove("show");
+
+  displayScores();
+};
+
+playButton.addEventListener("click", start);
